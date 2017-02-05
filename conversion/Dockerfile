@@ -1,6 +1,6 @@
 FROM bvlc/caffe:cpu
 
-ENV MODEL_NAME vgg_conv
+ENV MODEL_NAME dilation8_pascal_voc
 
 RUN pip install tensorflow
 
@@ -9,4 +9,4 @@ CMD cd caffe-tensorflow && \
     --caffemodel ../$MODEL_NAME.caffemodel \
     --data-output-path ../converted/$MODEL_NAME.npy \
     --code-output-path ../converted/${MODEL_NAME}.py \
-    ../dilation8_pascal_voc_deploy.prototxt
+    ../${MODEL_NAME}.prototxt

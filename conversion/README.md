@@ -2,8 +2,8 @@
 
 Pull in the network definition and Caffe weights trained by the authors (example for Pascal VOC):
 
-    wget -O vgg_conv.caffemodel https://umich.box.com/shared/static/obagzzef426d3ty4tihgscr17nxmgvo1.caffemodel
-    wget https://raw.githubusercontent.com/fyu/dilation/master/models/dilation8_pascal_voc_deploy.prototxt
+    wget http://vobj.cs.princeton.edu/models/dilation8_pascal_voc.caffemodel
+    curl -O dilation8_pascal_voc.prototxt https://raw.githubusercontent.com/fyu/dilation/master/models/dilation8_pascal_voc_deploy.prototxt
 
 Clone caffe-tensorflow in the current directory:
 
@@ -11,6 +11,6 @@ Clone caffe-tensorflow in the current directory:
 
 Build and run the Dockerfile:
 
-    docker run -v $(pwd):/workspace -ti `docker build -f Dockerfile -q .`
+    docker run -v $(pwd):/workspace -ti `docker build -q .`
 
 Weights and code end up in `converted/`
