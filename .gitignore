@@ -1,2 +1,8 @@
 *.npy
 *.pyc
+/conversion
+!/conversion/.dockerignore
+!/conversion/Dockerfile
+!/conversion/README.md
+
+/.idea/

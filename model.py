@@ -1,6 +1,7 @@
-from keras.models import Sequential
+from keras.layers import Activation, Reshape, Dropout
 from keras.layers import AtrousConvolution2D, Convolution2D, MaxPooling2D, ZeroPadding2D
-from keras.layers import Activation, Dropout, Flatten, Dense, Permute, Reshape
+from keras.models import Sequential
+
 
 #
 # The VGG16 keras model is taken from here:
@@ -8,7 +9,7 @@ from keras.layers import Activation, Dropout, Flatten, Dense, Permute, Reshape
 # The (caffe) structure of DilatedNet is here:
 # https://github.com/fyu/dilation/blob/master/models/dilation8_pascal_voc_deploy.prototxt
 
-def get_model(input_width, input_height):
+def get_frontend(input_width, input_height) -> Sequential:
     model = Sequential()
     # model.add(ZeroPadding2D((1, 1), input_shape=(input_width, input_height, 3)))
     model.add(Convolution2D(64, 3, 3, activation='relu', name='conv1_1', input_shape=(input_width, input_height, 3)))
@@ -38,13 +39,34 @@ def get_model(input_width, input_height):
     # Compared to the VGG16, we replace the FC layer with a convolution
 
     model.add(AtrousConvolution2D(4096, 7, 7, atrous_rate=(4, 4), activation='relu', name='fc6'))
-    # TODO: dropout for training
+    model.add(Dropout(0.5))
     model.add(Convolution2D(4096, 1, 1, activation='relu', name='fc7'))
-    # TODO: dropout for training
+    model.add(Dropout(0.5))
     # Note: this layer has linear activations, not ReLU
-    model.add(Convolution2D(21, 1, 1, name='fc-final'))
+    model.add(Convolution2D(21, 1, 1, activation='linear', name='fc-final'))
 
-    # Context module
+    # model.layers[-1].output_shape == (None, 16, 16, 21)
+    return model
+
+
+def add_softmax(model: Sequential) -> Sequential:
+    """ Append the softmax layers to the frontend or frontend + context net. """
+    # The softmax layer doesn't work on the (width, height, channel)
+    # shape, so we reshape to (width*height, channel) first.
+    # https://github.com/fchollet/keras/issues/1169
+    _, curr_width, curr_height, curr_channels = model.layers[-1].output_shape
+
+    model.add(Reshape((curr_width * curr_height, curr_channels)))
+    model.add(Activation('softmax'))
+    # Technically, we need another Reshape here to reshape to 2d, but TF
+    # the complains when batch_size > 1. We're just going to reshape in numpy.
+    # model.add(Reshape((curr_width, curr_height, curr_channels)))
+
+    return model
+
+
+def add_context(model: Sequential) -> Sequential:
+    """ Append the context layers to the frontend. """
     model.add(ZeroPadding2D(padding=(33, 33)))
     model.add(Convolution2D(42, 3, 3, activation='relu', name='ct_conv1_1'))
     model.add(Convolution2D(42, 3, 3, activation='relu', name='ct_conv1_2'))
@@ -54,13 +76,5 @@ def get_model(input_width, input_height):
     model.add(AtrousConvolution2D(672, 3, 3, atrous_rate=(16, 16), activation='relu', name='ct_conv5_1'))
     model.add(Convolution2D(672, 3, 3, activation='relu', name='ct_fc1'))
     model.add(Convolution2D(21, 1, 1, name='ct_final'))
-
-    # The softmax layer doesn't work on the (width, height, channel)
-    # shape, so we reshape to (width*height, channel) first.
-    # https://github.com/fchollet/keras/issues/1169
-    curr_width, curr_height, curr_channels = model.layers[-1].output_shape[1:]
-    model.add(Reshape((curr_width*curr_height, curr_channels)))
-    model.add(Activation('softmax'))
-    model.add(Reshape((curr_width, curr_height, curr_channels)))
 
     return model
