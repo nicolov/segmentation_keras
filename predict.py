@@ -13,33 +13,49 @@ import os
 
 import numpy as np
 from PIL import Image
-from scipy.ndimage import interpolation
+from IPython import embed
 
-from model import get_model
-from utils import interp_map
+from model import get_frontend, add_softmax, add_context
+from utils import interp_map, pascal_palette
 
-# Pascal color palette
-palette = np.array(
-    [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0], [0, 0, 128], [128, 0, 128], [0, 128, 128],
-     [128, 128, 128], [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0], [64, 0, 128], [192, 0, 128],
-     [64, 128, 128], [192, 128, 128], [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0], [0, 64, 128]],
-    dtype=np.uint8)
-
+# Settings for the Pascal dataset
 input_width, input_height = 900, 900
 label_margin = 186
 
+has_context_module = False
 
 def get_trained_model(args):
-    ''' Returns a model with loaded weights. '''
+    """ Returns a model with loaded weights. """
 
-    model = get_model(input_width, input_height)
-    weights_data = np.load(args.weights_path).item()
+    model = get_frontend(input_width, input_height)
 
-    for layer in model.layers:
-        if layer.name in weights_data.keys():
-            layer_weights = weights_data[layer.name]
-            layer.set_weights((layer_weights['weights'],
-                               layer_weights['biases']))
+    if has_context_module:
+        model = add_context(model)
+
+    model = add_softmax(model)
+
+    def load_tf_weights():
+        """ Load pretrained weights converted from Caffe to TF. """
+
+        # 'latin1' enables loading .npy files created with python2
+        weights_data = np.load(args.weights_path, encoding='latin1').item()
+
+        for layer in model.layers:
+            if layer.name in weights_data.keys():
+                layer_weights = weights_data[layer.name]
+                layer.set_weights((layer_weights['weights'],
+                                   layer_weights['biases']))
+
+    def load_keras_weights():
+        """ Load a Keras checkpoint. """
+        model.load_weights(args.weights_path)
+
+    if args.weights_path.endswith('.npy'):
+        load_tf_weights()
+    elif args.weights_path.endswith('.hdf5'):
+        load_keras_weights()
+    else:
+        raise Exception("Unknown weights format.")
 
     return model
 
@@ -82,9 +98,13 @@ def forward_pass(args):
                     margins_w,
                     (0, 0)), 'reflect')
 
-    # Pass the image to the network
+    # Run inference
     net_in[0] = image
     prob = model.predict(net_in)[0]
+
+    # Reshape to 2d here since the networks outputs a flat array per channel
+    prob_edge = np.sqrt(prob.shape[0]).astype(np.int)
+    prob = prob.reshape((prob_edge, prob_edge, 21))
 
     # Upsample
     if args.zoom > 1:
@@ -94,11 +114,12 @@ def forward_pass(args):
     prediction = np.argmax(prob, axis=2)
 
     # Apply the color palette to the segmented image
-    color_image = np.array(palette)[prediction.ravel()].reshape(
+    color_image = np.array(pascal_palette)[prediction.ravel()].reshape(
         prediction.shape + (3,))
 
     print('Saving results to: ', args.output_path)
-    Image.fromarray(color_image).save(open(args.output_path, 'w'))
+    with open(args.output_path, 'wb') as out_file:
+        Image.fromarray(color_image).save(out_file)
 
 
 def main():
