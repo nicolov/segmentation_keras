@@ -116,13 +116,13 @@ class SegmentationDataGenerator:
 
         def pad_image(image):
             image_pad_kwargs = dict(mode='reflect')
-            image = add_context_margin(image, 186, **image_pad_kwargs)
+            image = add_context_margin(image, label_margin, **image_pad_kwargs)
             return pad_to_square(image, 500, **image_pad_kwargs)
 
         def pad_label(image):
             # Same steps as the image, but the borders are constant white
             label_pad_kwargs = dict(mode='constant', constant_values=255)
-            image = add_context_margin(image, 186, **label_pad_kwargs)
+            image = add_context_margin(image, label_margin, **label_pad_kwargs)
             return pad_to_square(image, 500, **label_pad_kwargs)
 
         pairs = ((pad_image(image), pad_label(label)) for
@@ -165,7 +165,7 @@ class SegmentationDataGenerator:
             return image[offset:offset + label_size * stride:stride,
                    offset:offset + label_size * stride:stride]
 
-        pairs = ((image, slice_label(label, 186, 16, 8)) for
+        pairs = ((image, slice_label(label, label_margin, 16, 8)) for
                  image, label in pairs)
 
         return pairs
