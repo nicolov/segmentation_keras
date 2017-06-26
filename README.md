@@ -16,9 +16,9 @@ The code requires Python 3.5.
 Using the pretrained model
 ----------------
 
-Download the pretrained model [here]() and extract it:
+Download and extract the pretrained model:
 
-    tar -xvf nicolov_segmentation_model.tar.gz
+    curl -L https://github.com/nicolov/segmentation_keras/releases/download/model/nicolov_segmentation_model.tar.gz | tar xvf -
 
 Install dependencies and run:
 
