@@ -12,19 +12,33 @@ A native Keras implementation of semantic segmentation according to
 
 The code requires Python 3.5.
 
-Testing
--------
+
+Using the pretrained model
+----------------
+
+Download the pretrained model [here]() and extract it:
+
+    tar -xvf nicolov_segmentation_model.tar.gz
+
+Install dependencies and run:
+
+```
+pip install -r requirements.txt
+# For GPU support
+pip install tensorflow-gpu==0.12.1
+
+python predict.py --weights_path conversion/converted/dilation8_pascal_voc.npy
+```
+
+The output image will be under `images/cat_seg.png`.
+
+
+Converting the original Caffe model
+-----------------------------------
 
 Follow the instructions in the `conversion` folder to convert the weights to the TensorFlow
 format that can be used by Keras.
 
-
-```
-pip install -r requirements.txt
-pip install tensorflow-gpu
-
-python predict.py --weights_path conversion/converted/dilation8_pascal_voc.npy
-```
 
 Training
 --------

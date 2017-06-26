@@ -1,8 +1,12 @@
 *.npy
 *.pyc
+
 /conversion
 !/conversion/.dockerignore
 !/conversion/Dockerfile
 !/conversion/README.md
+!/conversion/converted/.gitkeep
+
+nicolov_segmentation_model.tar.gz
 
 /.idea/

@@ -4,9 +4,11 @@ ipython==5.1.0
 ipython-genutils==0.1.0
 Keras==1.2.1
 numpy==1.12.0
+olefile==0.44
 packaging==16.8
 pexpect==4.2.1
 pickleshare==0.7.4
+Pillow==4.1.1
 prompt-toolkit==1.0.9
 protobuf==3.1.0.post1
 ptyprocess==0.5.1
