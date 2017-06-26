@@ -54,10 +54,10 @@ class RandomTransformer:
     def transform(x: np.array, params: TransformParams) -> np.array:
         """Transforms a single image according to the parameters given."""
         if params.do_hor_flip:
-            x = flip_axis(x, 2)
+            x = flip_axis(x, 1)
 
         if params.do_vert_flip:
-            x = flip_axis(x, 1)
+            x = flip_axis(x, 0)
 
         return x
 
