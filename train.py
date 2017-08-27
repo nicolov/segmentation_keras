@@ -28,13 +28,13 @@ def load_weights(model, weights_path):
 
 @click.command()
 @click.option('--train-list-fname', type=click.Path(exists=True),
-              default='/mnt/pascal_voc/benchmark_RELEASE/dataset/train.txt')
+              default='benchmark_RELEASE/dataset/train.txt')
 @click.option('--val-list-fname', type=click.Path(exists=True),
-              default='/mnt/pascal_voc/benchmark_RELEASE/dataset/val.txt')
+              default='benchmark_RELEASE/dataset/val.txt')
 @click.option('--img-root', type=click.Path(exists=True),
-              default='/mnt/pascal_voc/benchmark_RELEASE/dataset/img')
+              default='benchmark_RELEASE/dataset/img')
 @click.option('--mask-root', type=click.Path(exists=True),
-              default='/mnt/pascal_voc/benchmark_RELEASE/dataset/pngs')
+              default='benchmark_RELEASE/dataset/pngs')
 @click.option('--weights-path', type=click.Path(exists=True),
               default='conversion/converted/vgg_conv.npy')
 @click.option('--batch-size', type=int, default=1)

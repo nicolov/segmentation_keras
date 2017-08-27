@@ -9,4 +9,10 @@
 
 nicolov_segmentation_model.tar.gz
 
+# Pascal VOC dataset
+benchmark.tgz
+benchmark_RELEASE
+
+trained/
+
 /.idea/

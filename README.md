@@ -10,7 +10,7 @@ A native Keras implementation of semantic segmentation according to
 *Multi-Scale Context Aggregation by Dilated Convolutions (2016)*. Optionally uses the pretrained weights by the
 [authors'](https://github.com/fyu/dilation).
 
-The code requires Python 3.5.
+The code has been tested on Tensorflow 1.3, Keras 1.2, and Python 3.6.
 
 
 Using the pretrained model
@@ -44,12 +44,16 @@ Training
 --------
 
 Download the *Augmented Pascal VOC* dataset
-[here](http://home.bharathh.info/pubs/codes/SBD/download.html). Use the `convert_masks.py` script to convert the
-provided masks in *.mat* format to RGB pngs:
+[here](http://home.bharathh.info/pubs/codes/SBD/download.html):
+
+    curl -L http://www.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/semantic_contours/benchmark.tgz | tar -xvf -
+
+This will create a `benchmark_RELEASE` directory in the root of the repo.
+Use the `convert_masks.py` script to convert the provided masks in *.mat* format to RGB pngs:
 
     python convert_masks.py \
-        --in-dir /mnt/pascal_voc/dataset/cls \
-        --out-dir /mnt/pascal_voc/dataset/pngs
+        --in-dir benchmark_RELEASE/dataset/cls \
+        --out-dir benchmark_RELEASE/dataset/pngs
 
 Start training:
 

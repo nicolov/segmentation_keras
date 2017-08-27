@@ -12,6 +12,7 @@ http://home.bharathh.info/pubs/codes/SBD/download.html
 
 import argparse
 import glob
+import os
 from os import path
 import scipy.io
 import PIL
@@ -54,11 +55,16 @@ def main():
 
     assert len(files), 'no matlab files found in the input folder'
 
+    try:
+        os.makedirs(args.out_dir)
+    except OSError:
+        pass
+
     # BOUNDARIES_IDX = 0
     SEGMENTATION_IDX = 1
     # CATEGORIES_PRESENT_IDX  = 2
 
-    for fname in files:
+    for f_cnt, fname in enumerate(files):
         mat = scipy.io.loadmat(fname, mat_dtype=True)
         seg_data = mat['GTcls'][0][0][SEGMENTATION_IDX]
         img_data = np.zeros(seg_data.shape, dtype=np.uint8)
@@ -71,6 +77,7 @@ def main():
         img_name = str.replace(path.basename(fname), '.mat', '.png')
         img.save(path.join(args.out_dir, img_name), 'png')
 
+        print(f'{f_cnt:05}/{len(files):05}')
 
 if __name__ == '__main__':
     main()
