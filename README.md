@@ -25,7 +25,7 @@ Install dependencies and run:
 ```
 pip install -r requirements.txt
 # For GPU support
-pip install tensorflow-gpu==0.12.1
+pip install tensorflow-gpu==1.3.0
 
 python predict.py --weights_path conversion/converted/dilation8_pascal_voc.npy
 ```
